@@ -1,13 +1,21 @@
 package com.github.phantomthieft.test;
 
 import static com.github.phantomthief.util.CursorIterator.newBuilder;
+import static java.util.Spliterator.IMMUTABLE;
+import static java.util.Spliterator.NONNULL;
+import static java.util.Spliterator.ORDERED;
+import static java.util.Spliterators.spliteratorUnknownSize;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -91,24 +99,6 @@ class CursorIteratorTest {
         Integer startId = 100;
         int countPerFetch = 10;
         CursorIterator<Integer, User> users = newBuilder() //
-                .start(startId) //
-                .cursorExtractor(User::getId) //
-                .bufferSize(countPerFetch) //
-                .build(userDAO::getUsersAscById);
-
-        List<User> collect = users.stream() //
-                .filter(user -> user.getId() % 11 == 0) //
-                .limit(5) //
-                .collect(toList());
-        collect.forEach(u -> logger.info("user:{}", u));
-    }
-
-    @Test
-    void testGenericBuilder() {
-        UserDAO userDAO = new UserDAO();
-        Integer startId = 100;
-        int countPerFetch = 10;
-        CursorIterator<Integer, User> users = CursorIterator.<Integer, User> newGenericBuilder() //
                 .start(startId) //
                 .cursorExtractor(User::getId) //
                 .bufferSize(countPerFetch) //

@@ -51,25 +51,33 @@ public class CursorIterator<Id, Entity> implements Iterable<Entity> {
     @Nonnull
     @Override
     public Iterator<Entity> iterator() {
+        // 实现接口 iterator
         return new AbstractIterator<Entity>() {
 
+            // 元素是 List<Entity> 的 Iterator
             private final Iterator<List<Entity>> pageIterator = pageScroller.iterator();
+
+            // 单页的数据: pageIterator 返回的 List<Entity>
             private Iterator<Entity> entityIteratorInPage;
 
+            // 元素是单个 Entity 的 Iterator
             @Override
             protected Entity computeNext() {
                 if (entityIteratorInPage == null || !entityIteratorInPage.hasNext()) {
                     if (pageIterator.hasNext()) {
+                        // 获取返回的一页数据
                         entityIteratorInPage = pageIterator.next().iterator();
                     } else {
                         return endOfData();
                     }
                 }
+                // 获取一页里的单个数据
                 return entityIteratorInPage.next();
             }
         };
     }
 
+//    https://juejin.im/post/5bb8d651e51d450e7042a9a4
     public Stream<Entity> stream() {
         return StreamSupport
                 .stream(spliteratorUnknownSize(iterator(), (NONNULL | IMMUTABLE | ORDERED)), false);

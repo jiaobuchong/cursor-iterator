@@ -57,6 +57,9 @@ class PageScroller<Id, Entity> implements Iterable<List<Entity>> {
         private boolean firstTime = true;
         private int pageIndex = 0;
 
+        // computeNext 会去设置DONE的状态，一旦设置成 DONE，iterator 就结束
+        // tryToComputeNext 设置 READY 和 FAILED 状态
+        // next 设置 NOT_READY 状态
         @Override
         protected List<Entity> computeNext() {
             List<Entity> page;
@@ -107,12 +110,15 @@ class PageScroller<Id, Entity> implements Iterable<List<Entity>> {
             if (pageIndex > maxNumberOfPages) {
                 return endOfData();
             }
+            // 每次取出 bufferSize + 1 个
+            // cursor 一开始是1，比如你的 sql 是 select * from one_table where id >= :cursor limit bufferSize;
+            // +1 的目的就是为了判断是否下一页还有数据
             List<Entity> list = dao.getByCursor(cursor, bufferSize + 1);
             if (list.isEmpty()) {
                 return endOfData();
             }
             if (list.size() >= bufferSize + 1) {
-                cursor = entityIdFunction.apply(list.get(bufferSize));
+                cursor = entityIdFunction.apply(list.get(bufferSize));   // 得到 bufferSize + 1 个的元素
                 return list.subList(0, bufferSize);
             } else {
                 noNext = true;
