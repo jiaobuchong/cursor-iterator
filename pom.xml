@@ -2,17 +2,24 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.phantomthief</groupId>
     <artifactId>cursor-iterator</artifactId>
-    <version>1.0.12-SNAPSHOT</version>
+    <version>1.0.14-SNAPSHOT</version>
 
     <properties>
-        <junit-jupiter.version>5.0.2</junit-jupiter.version>
-        <logback-classic.version>1.1.8</logback-classic.version>
-        <junit-platform.version>1.0.2</junit-platform.version>
+        <jsr305.version>1.3.9</jsr305.version>
+        <guava.version>28.1-jre</guava.version>
 
-        <maven-surefire-plugin.version>2.19.1</maven-surefire-plugin.version>
+        <junit.version>5.7.0</junit.version>
+        <logback-classic.version>1.1.8</logback-classic.version>
+
+        <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
         <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
-        <jacoco-maven-plugin.version>0.7.9</jacoco-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.8.6</jacoco-maven-plugin.version>
         <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
+        <maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
+        <git-commit-id-plugin.version>2.2.6</git-commit-id-plugin.version>
+        <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
     </properties>
 
     <parent>
@@ -41,30 +48,46 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:https://github.com/PhantomThief/cursor-iterator.git</connection>
+        <connection>scm:git:git@github.com:PhantomThief/cursor-iterator.git</connection>
         <url>https://github.com/PhantomThief/cursor-iterator.git</url>
-        <developerConnection>scm:git:https://github.com/PhantomThief/cursor-iterator.git
+        <developerConnection>scm:git:git@github.com:PhantomThief/cursor-iterator.git
         </developerConnection>
     </scm>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>19.0</version>
+            <version>${guava.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>jsr305</artifactId>
-            <version>1.3.9</version>
+            <version>${jsr305.version}</version>
             <optional>true</optional><!-- needed only for annotations -->
         </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit-jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -80,7 +103,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5.1</version>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
@@ -96,7 +119,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>${maven-source-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -109,9 +132,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.3</version>
+                <version>${maven-javadoc-plugin.version}</version>
                 <configuration>
-                    <additionalparam>-Xdoclint:none</additionalparam>
+                    <doclint>none</doclint>
+                    <source>8</source>
                 </configuration>
                 <executions>
                     <execution>
@@ -154,18 +178,56 @@
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.junit.platform</groupId>
-                        <artifactId>junit-platform-surefire-provider</artifactId>
-                        <version>${junit-platform.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.junit.jupiter</groupId>
-                        <artifactId>junit-jupiter-engine</artifactId>
-                        <version>${junit-jupiter.version}</version>
-                    </dependency>
-                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <version>${git-commit-id-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>get-the-git-infos</id>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <verbose>false</verbose>
+                    <abbrevLength>8</abbrevLength>
+                    <dateFormat>yyyyMMddHHmmssSSS</dateFormat>
+                    <failOnNoGitDirectory>false</failOnNoGitDirectory>
+                    <failOnUnableToExtractRepoInfo>false</failOnUnableToExtractRepoInfo>
+                    <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                    <gitDescribe>
+                        <skip>true</skip>
+                    </gitDescribe>
+                    <includeOnlyProperties>
+                        <include>git.branch</include>
+                        <include>git.build</include>
+                        <include>git.commit.id</include>
+                        <include>git.commit.time</include>
+                        <include>git.commit.user</include>
+                        <include>git.remote.origin.url</include>
+                    </includeOnlyProperties>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven-jar-plugin.version}</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                        <manifestEntries>
+                            <Implementation-Build>${git.commit.id}</Implementation-Build>
+                            <Implementation-Timestamp>${git.build.time}</Implementation-Timestamp>
+                            <Implementation-Branch>${git.branch}</Implementation-Branch>
+                            <Java-Compiler-JvmTarget>${java.version}</Java-Compiler-JvmTarget>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
             </plugin>
         </plugins>
     </build>
