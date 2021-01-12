@@ -145,7 +145,7 @@ public class CursorIteratorEx<T, C, R> implements Iterable<T> {
          *
          * @param dataRetriever 数据读取函数，传入当前起始的ID，返回查询结果对象
          * @param <C1> ID类型泛型
-         * @param <R1> 查询结果泛型
+         * @param <R1> 查询结果 holder 泛型
          * @return 当前构造器对象
          */
         @CheckReturnValue
