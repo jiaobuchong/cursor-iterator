@@ -37,4 +37,21 @@ class CursorIteratorExTest {
                 .collect(toList());
         collect.forEach(u -> logger.info("user:{}", u));
     }
+
+    @Test
+    void test1() {
+        UserDAO userDAO = new UserDAO();
+        Integer startId = 1;
+        int countPerFetch = 10;
+        CursorIteratorEx<User, Integer, ScanResult> users = newBuilder()
+                .withDataRetriever((Integer cursor) -> userDAO.scan1(cursor, countPerFetch))
+                .withCursorExtractor(ScanResult::getNextCursor)
+                .withDataExtractor((ScanResult s) -> s.getUsers().iterator())
+                .withInitCursor(startId)
+                .build();
+
+        List<User> collect = users.stream()
+                .collect(toList());
+        collect.forEach(u -> logger.info("user:{}", u));
+    }
 }
